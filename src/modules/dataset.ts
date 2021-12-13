@@ -1,15 +1,15 @@
-import {VNode, VNodeData} from '../vnode';
-import {Module} from './module';
+import { VNode, VNodeData } from "../vnode";
+import { Module } from "./module";
 
 export type Dataset = Record<string, string>;
 
 const CAPS_REGEX = /[A-Z]/g;
 
 function updateDataset(oldVnode: VNode, vnode: VNode): void {
-  let elm: HTMLElement = vnode.elm as HTMLElement,
-    oldDataset = (oldVnode.data as VNodeData).dataset,
-    dataset = (vnode.data as VNodeData).dataset,
-    key: string;
+  const elm: HTMLElement = vnode.elm as HTMLElement;
+  let oldDataset = (oldVnode.data as VNodeData).dataset;
+  let dataset = (vnode.data as VNodeData).dataset;
+  let key: string;
 
   if (!oldDataset && !dataset) return;
   if (oldDataset === dataset) return;
@@ -24,7 +24,9 @@ function updateDataset(oldVnode: VNode, vnode: VNode): void {
           delete d[key];
         }
       } else {
-        elm.removeAttribute('data-' + key.replace(CAPS_REGEX, '-$&').toLowerCase());
+        elm.removeAttribute(
+          "data-" + key.replace(CAPS_REGEX, "-$&").toLowerCase()
+        );
       }
     }
   }
@@ -33,11 +35,16 @@ function updateDataset(oldVnode: VNode, vnode: VNode): void {
       if (d) {
         d[key] = dataset[key];
       } else {
-        elm.setAttribute('data-' + key.replace(CAPS_REGEX, '-$&').toLowerCase(), dataset[key]);
+        elm.setAttribute(
+          "data-" + key.replace(CAPS_REGEX, "-$&").toLowerCase(),
+          dataset[key]
+        );
       }
     }
   }
 }
 
-export const datasetModule = {create: updateDataset, update: updateDataset} as Module;
-export default datasetModule;
+export const datasetModule: Module = {
+  create: updateDataset,
+  update: updateDataset,
+};

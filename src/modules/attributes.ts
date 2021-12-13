@@ -1,25 +1,18 @@
-import {VNode, VNodeData} from '../vnode';
-import {Module} from './module';
+import { VNode, VNodeData } from "../vnode";
+import { Module } from "./module";
 
-// because those in TypeScript are too restrictive: https://github.com/Microsoft/TSJS-lib-generator/pull/237
-declare global {
-  interface Element {
-    setAttribute(name: string, value: string | number | boolean): void;
-    setAttributeNS(namespaceURI: string, qualifiedName: string, value: string | number | boolean): void;
-  }
-}
+export type Attrs = Record<string, string | number | boolean>;
 
-export type Attrs = Record<string, string | number | boolean>
-
-const xlinkNS = 'http://www.w3.org/1999/xlink';
-const xmlNS = 'http://www.w3.org/XML/1998/namespace';
+const xlinkNS = "http://www.w3.org/1999/xlink";
+const xmlNS = "http://www.w3.org/XML/1998/namespace";
 const colonChar = 58;
 const xChar = 120;
 
 function updateAttrs(oldVnode: VNode, vnode: VNode): void {
-  var key: string, elm: Element = vnode.elm as Element,
-      oldAttrs = (oldVnode.data as VNodeData).attrs,
-      attrs = (vnode.data as VNodeData).attrs;
+  let key: string;
+  const elm: Element = vnode.elm as Element;
+  let oldAttrs = (oldVnode.data as VNodeData).attrs;
+  let attrs = (vnode.data as VNodeData).attrs;
 
   if (!oldAttrs && !attrs) return;
   if (oldAttrs === attrs) return;
@@ -37,15 +30,15 @@ function updateAttrs(oldVnode: VNode, vnode: VNode): void {
         elm.removeAttribute(key);
       } else {
         if (key.charCodeAt(0) !== xChar) {
-          elm.setAttribute(key, cur);
+          elm.setAttribute(key, cur as any);
         } else if (key.charCodeAt(3) === colonChar) {
           // Assume xml namespace
-          elm.setAttributeNS(xmlNS, key, cur);
+          elm.setAttributeNS(xmlNS, key, cur as any);
         } else if (key.charCodeAt(5) === colonChar) {
           // Assume xlink namespace
-          elm.setAttributeNS(xlinkNS, key, cur);
+          elm.setAttributeNS(xlinkNS, key, cur as any);
         } else {
-          elm.setAttribute(key, cur);
+          elm.setAttribute(key, cur as any);
         }
       }
     }
@@ -60,5 +53,7 @@ function updateAttrs(oldVnode: VNode, vnode: VNode): void {
   }
 }
 
-export const attributesModule = {create: updateAttrs, update: updateAttrs} as Module;
-export default attributesModule;
+export const attributesModule: Module = {
+  create: updateAttrs,
+  update: updateAttrs,
+};

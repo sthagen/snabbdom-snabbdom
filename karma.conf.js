@@ -1,66 +1,79 @@
 const ci = !!process.env.CI;
 const watch = !!process.env.WATCH;
 const live = !!process.env.LIVE;
+const es5 = !!process.env.ES5;
 
-const identifier = process.env.BROWSERSTACK_LOCAL_IDENTIFIER;
-const ip = process.env.IP_ADDR;
+const ip = "bs-local.com";
 
-const browserstack = require('./browserstack-karma.js');
+const browserstack = require("./browserstack-karma.js");
+
+// https://www.browserstack.com/open-source (text search "parallels")
+// Instead of the 5 available we only use 2, so two commits can run CI at the same time
+const BROWSERSTACK_OPEN_SOURCE_CONCURRENCY = 2;
+
+const getBrowserstackBrowsers = () =>
+  Object.keys(browserstack).filter((k) => !!browserstack[k].es5 === es5);
 
 const browsers = ci
-  ? Object.keys(browserstack)
+  ? getBrowserstackBrowsers()
   : live
-    ? undefined
-    : watch
-      ? ['Chrome']
-      : ['Chrome', 'Firefox'];
+  ? undefined
+  : watch
+  ? ["Chrome"]
+  : ["ChromeHeadless", "FirefoxHeadless"];
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
-    basePath: '.',
-    frameworks: ['mocha', 'karma-typescript'],
+    basePath: ".",
+    frameworks: ["mocha", "karma-typescript"],
     // list of files / patterns to load in the browser
-    files: [{pattern: 'src/**/*.ts'}, {pattern: 'test/**/*'}],
-    plugins: [
-      'karma-mocha',
-      'karma-chrome-launcher',
-      'karma-firefox-launcher',
-      'karma-browserstack-launcher',
-      'karma-typescript',
-    ],
-    hostname: ci ? ip : 'localhost',
+    files: process.env.FILES_PATTERN.split(",")
+      .map((p) => ({ pattern: p }))
+      .concat({ pattern: "src/**/*.ts" }),
     preprocessors: {
-      'src/**/*.ts': ['karma-typescript'],
-      'test/**/*.js': ['karma-typescript'],
+      "**/*.ts": "karma-typescript",
+      "**/*.tsx": "karma-typescript",
+    },
+    plugins: [
+      "karma-mocha",
+      "karma-typescript",
+      "karma-mocha-reporter",
+      require("./karma-benchmark-reporter.cjs"),
+      "karma-chrome-launcher",
+      "karma-firefox-launcher",
+      "karma-browserstack-launcher",
+    ],
+    hostname: ci ? ip : "localhost",
+    karmaTypescriptConfig: {
+      compilerOptions: {
+        ...require("./tsconfig.json").compilerOptions,
+        ...require("./test/tsconfig.json").compilerOptions,
+        sourceMap: false,
+        inlineSourceMap: true,
+        target: es5 ? "es5" : "es6",
+      },
+      bundlerOptions: {
+        sourceMap: true,
+      },
+      include: process.env.FILES_PATTERN.split(",").concat("src/**/*.ts"),
     },
     browserStack: {
-      name: 'Snabbdom',
-      startTunnel: false,
-      retryLimit: 3,
-      tunnelIdentifier: identifier,
+      name: "Snabbdom",
+      retryLimit: 1,
     },
-    browserNoActivityTimeout: 1000000,
+    client: {
+      captureConsole: true,
+    },
     customLaunchers: browserstack,
-    karmaTypescriptConfig: {
-      coverageOptions: {
-        exclude: /test\//,
-      },
-      compilerOptions: {
-        allowJs: true,
-        declaration: false
-      },
-      tsconfig: './tsconfig.json',
-      include: {
-        mode: 'merge',
-        values: ['test/**/*'],
-      },
+    reporters: ["karma-typescript", "mocha", "benchmark", "BrowserStack"],
+    mochaReporter: {
+      showDiff: true,
     },
-    reporters: ['dots', 'karma-typescript', 'BrowserStack'],
     port: 9876,
     colors: true,
     autoWatch: true,
     browsers: browsers,
     singleRun: !watch && !live,
-    concurrency: ci ? 1 : Infinity,
+    concurrency: ci ? BROWSERSTACK_OPEN_SOURCE_CONCURRENCY : Infinity,
   });
-}
+};

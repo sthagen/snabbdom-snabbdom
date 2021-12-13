@@ -1,18 +1,18 @@
-import {VNode, VNodeData} from '../vnode';
+import { VNode, VNodeData } from "../vnode";
 
 export interface AttachData {
-  [key: string]: any
-  [i: number]: any
-  placeholder?: any
-  real?: Node
+  [key: string]: any;
+  [i: number]: any;
+  placeholder?: any;
+  real?: Node;
 }
 
 interface VNodeDataWithAttach extends VNodeData {
-  attachData: AttachData
+  attachData: AttachData;
 }
 
 interface VNodeWithAttachData extends VNode {
-  data: VNodeDataWithAttach
+  data: VNodeDataWithAttach;
 }
 
 function pre(vnode: VNodeWithAttachData, newVnode: VNodeWithAttachData): void {
@@ -39,8 +39,9 @@ function destroy(vnode: VNodeWithAttachData): void {
 }
 
 function create(_: any, vnode: VNodeWithAttachData): void {
-  const real = vnode.elm, attachData = vnode.data.attachData;
-  const placeholder = document.createElement('span');
+  const real = vnode.elm;
+  const attachData = vnode.data.attachData;
+  const placeholder = document.createElement("span");
   // Replace actual element with dummy placeholder
   // Snabbdom will then insert placeholder instead
   vnode.elm = placeholder;
@@ -54,11 +55,10 @@ export function attachTo(target: Element, vnode: VNode): VNode {
   if (vnode.data.hook === undefined) vnode.data.hook = {};
   const data = vnode.data;
   const hook = vnode.data.hook;
-  data.attachData = {target: target, placeholder: undefined, real: undefined};
+  data.attachData = { target: target, placeholder: undefined, real: undefined };
   hook.create = create;
   hook.prepatch = pre;
   hook.postpatch = post;
   hook.destroy = destroy;
   return vnode;
-};
-export default attachTo;
+}
