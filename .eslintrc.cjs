@@ -14,6 +14,7 @@ module.exports = {
     browser: true,
     node: false,
   },
+  ignorePatterns: ["browserstack-browsers.js", "web-test-runner.config.js"],
   overrides: [
     {
       files: ["*.ts", "*.tsx"],
@@ -34,6 +35,7 @@ module.exports = {
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/ban-types": "off",
         "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-redundant-type-constituents": "off",
       },
     },
     {
