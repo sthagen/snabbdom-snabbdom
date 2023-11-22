@@ -7,7 +7,14 @@
     "type": "git",
     "url": "git+https://github.com/snabbdom/snabbdom.git"
   },
-  "keywords": ["virtual", "dom", "vdom", "light", "kiss", "performance"],
+  "keywords": [
+    "virtual",
+    "dom",
+    "vdom",
+    "light",
+    "kiss",
+    "performance"
+  ],
   "author": "Simon Friis Vindum",
   "license": "MIT",
   "bugs": {
@@ -54,14 +61,15 @@
     "eslint-plugin-node": "11.1.0",
     "husky": "8.0.3",
     "lint-staged": "^15.0.2",
-    "lodash-es": "^4.17.21",
     "mocha": "10.2.0",
     "prettier": "^3.0.3",
     "release-it": "^16.2.1",
     "serve": "^14.2.1",
     "typescript": "5.2.2"
   },
-  "prettier": {},
+  "prettier": {
+    "trailingComma": "none"
+  },
   "lint-staged": {
     "*.(ts|tsx|js|md)": "prettier --write"
   },
