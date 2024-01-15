@@ -128,7 +128,7 @@ patch(vnode, newVnode); // Snabbdom efficiently updates the old view to the new 
     - [Unmounting](#unmounting)
   - [`h`](#h)
   - [`fragment`](#fragment-experimental) (experimental)
-  - [`tovnode`](#tovnode)
+  - [`toVNode`](#tovnode)
   - [Hooks](#hooks)
     - [Overview](#overview)
     - [Usage](#usage)
@@ -157,7 +157,7 @@ patch(vnode, newVnode); // Snabbdom efficiently updates the old view to the new 
 - [Virtual Node](#virtual-node)
   - [sel : String](#sel--string)
   - [data : Object](#data--object)
-  - [children : Array<vnode>](#children--arrayvnode)
+  - [children : Array\<vnode\>](#children--arrayvnode)
   - [text : string](#text--string)
   - [elm : Element](#elm--element)
   - [key : string | number](#key--string--number)
@@ -262,33 +262,30 @@ import { fragment, h } from "snabbdom";
 const vnode = fragment(["I am", h("span", [" a", " fragment"])]);
 ```
 
-### `tovnode`
+### `toVNode`
 
-Converts a DOM node into a virtual node. Especially good for patching over an pre-existing,
-server-side generated content.
+Converts a DOM node into a virtual node. Especially good for patching over pre-existing,
+server-side generated HTML content.
 
 ```mjs
 import {
   init,
-  classModule,
-  propsModule,
   styleModule,
-  eventListenersModule,
+  attributesModule,
   h,
   toVNode
 } from "snabbdom";
 
 const patch = init([
-  // Init patch function with chosen modules
-  classModule, // makes it easy to toggle classes
-  propsModule, // for setting properties on DOM elements
-  styleModule, // handles styling on elements with support for animations
-  eventListenersModule // attaches event listeners
+  // Initialize a `patch` function with the modules used by `toVNode`
+  attributesModule // handles attributes from the DOM node
+  datasetModule, // handles `data-*` attributes from the DOM node
 ]);
 
 const newVNode = h("div", { style: { color: "#000" } }, [
   h("h1", "Headline"),
-  h("p", "A paragraph")
+  h("p", "A paragraph"),
+  h("img", { attrs: { src: "sunrise.png", alt: "morning sunrise" } })
 ]);
 
 patch(toVNode(document.querySelector(".container")), newVNode);
@@ -886,7 +883,7 @@ For example `h('div', {props: {className: 'container'}}, [...])` will produce a 
 
 as its `.data` object.
 
-### children : Array<vnode>
+### children : Array\<vnode\>
 
 The `.children` property of a virtual node is the third (optional)
 parameter to [`h()`](#snabbdomh) during creation. `.children` is
