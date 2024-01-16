@@ -1,18 +1,20 @@
 import { VNode, VNodeData } from "../vnode";
 import { Module } from "./module";
 
-export type ElementStyle = Partial<CSSStyleDeclaration>
+export type ElementStyle = Partial<CSSStyleDeclaration>;
 
-export type VNodeStyle = ElementStyle & Record<string, string> & {
-  delayed?: ElementStyle & Record<string, string>;
-  remove?: ElementStyle & Record<string, string>;
-};
+export type VNodeStyle = ElementStyle &
+  Record<string, string> & {
+    delayed?: ElementStyle & Record<string, string>;
+    remove?: ElementStyle & Record<string, string>;
+  };
 
 // Binding `requestAnimationFrame` like this fixes a bug in IE/Edge. See #360 and #409.
 const raf =
-  (typeof window !== "undefined" &&
-    window.requestAnimationFrame.bind(window)) ||
-  setTimeout;
+  typeof window?.requestAnimationFrame === "function"
+    ? window.requestAnimationFrame.bind(window)
+    : setTimeout;
+
 const nextFrame = function (fn: any) {
   raf(function () {
     raf(fn);
